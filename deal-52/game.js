@@ -17,7 +17,7 @@ function initialize(){
 function Game() {
     this.players = [];
     this.rounds = 0;
-    this.totalRounds = 1;
+    this.totalRounds = 15;
     this.initializeGame = function () {
         var playerCount = prompt('How many players? Pick a number from 1 to 4.');
         playerCount = parseInt(playerCount);
