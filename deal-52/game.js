@@ -17,7 +17,7 @@ function initialize(){
 function Game() {
     this.players = [];
     this.rounds = 0;
-    this.totalRounds = 15;
+    this.totalRounds = 1;
     this.initializeGame = function () {
         var playerCount = prompt('How many players? Pick a number from 1 to 4.');
         playerCount = parseInt(playerCount);
@@ -32,6 +32,7 @@ function Game() {
         for (var playerNumber = 0; playerNumber < number; playerNumber++) {
             player = new Player(); //create new player
             player.draw(3); //have player fill hand with 3 cards
+            player.name = "player" + playerNumber;
             this.players.push(player); //push player to array
         }
     };
@@ -40,8 +41,27 @@ function Game() {
             for (var player = 0; player < this.players.length; player++) {
                 this.players[player].playerTurn(); //call function of current player to begin turn
             }
+            this.rounds++;
         }
+        this.getWinner();
     };
+    this.getWinner = function(){
+      //loop through each player, keep track of who has the highest
+      var currentWinner;
+      var winnerScore = 0;
+      for(var player = 0 ; player < this.players.length ; player++){
+        var playerHand = this.players[player].hand;
+        var sum = 0;
+        for(var cardIndex = 0 ; cardIndex < playerHand.length; cardIndex++){
+          sum += playerHand[cardIndex];
+        }
+        if(sum > winnerScore){
+          winnerScore = sum;
+          currentWinner = this.players[player];
+        }
+      }
+      console.log(currentWinner.name + ' wins with a score of ' + winnerScore + "!");
+    }
 }
 
 /***************************************************************************************************
