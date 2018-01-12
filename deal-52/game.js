@@ -4,21 +4,31 @@
  * @returns: {undefined} none
  * creates game instance, prompts user for number of players, call FillDeck ,
  */
+$(document).ready(initialize);
+
+var game;
+
+function initialize(){
+  game = new Game();
+  game.initializeGame();
+}
+
 
 function Game() {
     this.players = [];
     this.rounds = 0;
     this.totalRounds = 15;
-    var drawPile;
-    var discardPile;
+    this.drawPile;
+    this.discardPile;
     this.initializeGame = function () {
         var playerCount = prompt('How many players? Pick a number from 1 to 4.');
         playerCount = parseInt(playerCount);
-        drawPile = new DrawPile();
-        discardPile = new Discard();
-        drawPile.createDeck(); //fill DrawPil with all 52 cards
+        this.drawPile = new DrawPile();
+        this.discardPile = new Discard();
+        this.drawPile.createDeck(); //fill DrawPil with all 52 cards
         this.createPlayers(playerCount); //create all player objects
-        this.playGame(); //begin the game
+        console.log(this.players)
+        // this.playGame(); //begin the game
     };
     this.createPlayers = function (number) {
         for (var playerNumber = 0; playerNumber < number; playerNumber++) {
@@ -34,7 +44,6 @@ function Game() {
             }
         }
     };
-    this.initializeGame();
 }
 
 /***************************************************************************************************
@@ -56,60 +65,56 @@ function Player(name) {
     };
 
     this.discardCards = function (cards) {
-        discardPile.receiveCards(cards);
+        game.discardPile.receiveCards(cards);
     };
 
     this.draw = function (numberOfCards) {
-        drawPile.dealCard(this, numberOfCards);
+        game.drawPile.dealCard(this, numberOfCards);
     };
 }
 
 /***************************************************************************************************
  * DrawPile
  */
-function DrawPile() {
-    /***********
-     * This is the updated DrawPile
-     *
-     **********/
-    this.deckOfCards = [];
-
-    this.createDeck = function () {
-        for (var createDeckIndex = 1; createDeckIndex <= 52; createDeckIndex++) {
-            deckOfCards.push(createDeckIndex);
-        }
-        console.log(deckOfCards);
-    };
-
-    this.dealCard = function (sender, numberOfCards) {
-        var cardArray = [];
-        console.log("Sender: " + sender + "Number of Cards: " + numberOfCards);
-        for (var i = 0; i < numberOfCards; i++) {
-            if (deckOfCards.length > 0) {
-                this.rebuildDeck();
-            }
-            cardArray.push(deckOfCards[i]);
-        }
-        this.deckOfCards.splice(0, numberOfCards);
-        sender.receiveCards(cardArray);
-    };
-
-    this.rebuildDeck = function (array) {
-        deckOfCards = this.shuffleDeck(array);
-        console.log(deckOfCards);
-    };
-
-    this.shuffleDeck = function (array) {
-        for (var i = array.length - 1; i > 0; i--) {
-            var j = Math.floor(Math.random() * (i + 1));
-            var temp = array[i];
-            array[i] = array[j];
-            array[j] = temp;
-        }
-        return array;
-    }
-
-
+ function DrawPile() {
+     /***********
+      * This is the updated DrawPile
+      *
+      **********/
+     this.deckOfCards = [];
+     this.createDeck = function () {
+         for (var createDeckIndex = 1; createDeckIndex <= 4; createDeckIndex++) {
+             for( var i = 1; i <= 13 ; i++){
+                 this.deckOfCards.push(i);
+             }
+         }
+         this.shuffleDeck();
+     };
+     this.dealCard = function (sender, numberOfCards) {
+         var cardArray = [];
+         console.log("Sender: " + sender + "Number of Cards: " + numberOfCards);
+         for (var i = 0; i < numberOfCards; i++) {
+             if (this.deckOfCards.length === 0) {
+                 game.discardPile.sendToDrawPile();
+             }
+             cardArray.push(this.deckOfCards[i]);
+         }
+         this.deckOfCards.splice(0, numberOfCards);
+         sender.receiveCards(cardArray);
+     };
+     this.rebuildDeck = function (array) {
+         this.deckOfCards = array;
+         this.shuffleDeck();
+         console.log(this.deckOfCards);
+     };
+     this.shuffleDeck = function () {
+         for (var i = this.deckOfCards.length - 1; i > 0; i--) {
+             var j = Math.floor(Math.random() * (i + 1));
+             var temp = this.deckOfCards[i];
+             this.deckOfCards[i] = this.deckOfCards[j];
+             this.deckOfCards[j] = temp;
+         }
+     }
 }
 
 /***************************************************************************************************
@@ -121,8 +126,12 @@ function Discard(name) {
         //receive cards from player add them to discard
         this.discardPile.concat(receivedCards);
     };
-    this.sendToDraw = function (cardsToSend) {
-        drawPile.rebuildDeck(cardsToSend);
-        this.discardPile.splice(1, discardPile.length-1);
+    this.sendToDrawPile = function () {
+      //make a copy of current array
+      //send to draw pile
+      //discard set to empty array
+        game.drawPile.rebuildDeck(this.discardPile);
+        this.discardPile = [];
+
     };
 }
