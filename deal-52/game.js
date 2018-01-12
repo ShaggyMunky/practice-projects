@@ -18,8 +18,6 @@ function Game() {
     this.players = [];
     this.rounds = 0;
     this.totalRounds = 15;
-    this.drawPile;
-    this.discardPile;
     this.initializeGame = function () {
         var playerCount = prompt('How many players? Pick a number from 1 to 4.');
         playerCount = parseInt(playerCount);
@@ -39,8 +37,8 @@ function Game() {
     };
     this.playGame = function () {
         while (this.rounds < this.totalRounds) {
-            for (var player = 0; player < players.length; players++) {
-                this.players[player].beginTurn(); //call function of current player to begin turn
+            for (var player = 0; player < this.players.length; player++) {
+                this.players[player].playerTurn(); //call function of current player to begin turn
             }
         }
     };
@@ -49,15 +47,21 @@ function Game() {
 /***************************************************************************************************
  *Player
  */
-function Player(name) {
+function Player() {
 
     this.hand = [];
 
     this.playerTurn = function () {
         console.log(this.hand);
-        var cardsToRemove = prompt("Choose your cards to remove");
+        var cardsToRemove = prompt("Choose your cards to remove").split(',');
+        for(var i = 0; i < cardsToRemove.length ; i++ ){
+            if(this.hand.indexOf(parseInt(cardsToRemove[i])) !== -1){
+                this.hand.splice(this.hand.indexOf(parseInt(cardsToRemove[i])),1);
+            }
+        }
         this.discardCards(cardsToRemove);
-        this.draw(cardsToRemove.length);
+        console.log(this.hand);
+        console.log('Discard Pile:'+ game.discardPile.discardPile);
     };
 
     this.receiveCards = function (cards) {
@@ -66,6 +70,7 @@ function Player(name) {
 
     this.discardCards = function (cards) {
         game.discardPile.receiveCards(cards);
+        this.draw(cards.length);
     };
 
     this.draw = function (numberOfCards) {
@@ -120,11 +125,11 @@ function Player(name) {
 /***************************************************************************************************
  * Discard
  */
-function Discard(name) {
+function Discard() {
     this.discardPile = [];
     this.receiveCards = function (receivedCards) {
         //receive cards from player add them to discard
-        this.discardPile.concat(receivedCards);
+        this.discardPile = this.discardPile.concat(receivedCards);
     };
     this.sendToDrawPile = function () {
       //make a copy of current array
