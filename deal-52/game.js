@@ -28,7 +28,7 @@ function Game() {
         this.drawPile.createDeck(); //fill DrawPil with all 52 cards
         this.createPlayers(playerCount); //create all player objects
         console.log(this.players)
-        // this.playGame(); //begin the game
+        this.playGame(); //begin the game
     };
     this.createPlayers = function (number) {
         for (var playerNumber = 0; playerNumber < number; playerNumber++) {
@@ -39,8 +39,8 @@ function Game() {
     };
     this.playGame = function () {
         while (this.rounds < this.totalRounds) {
-            for (var player = 0; player < players.length; players++) {
-                this.players[player].beginTurn(); //call function of current player to begin turn
+            for (var player = 0; player < this.players.length; players++) {
+                this.players[player].playerTurn(); //call function of current player to begin turn
             }
         }
     };
@@ -54,8 +54,8 @@ function Player(name) {
     this.hand = [];
 
     this.playerTurn = function () {
-        console.log(this.hand);
-        var cardsToRemove = prompt("Choose your cards to remove");
+        var cardsToRemove = prompt("Your hand:" + this.hand +". Choose your cards to remove");
+        
         this.discardCards(cardsToRemove);
         this.draw(cardsToRemove.length);
     };
